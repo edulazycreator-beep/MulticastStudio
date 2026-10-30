@@ -1,6 +1,6 @@
 name: Android Build
 
-"on":
+on:
   push:
     branches: [ main, master ]
   pull_request:
@@ -22,9 +22,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
 
+      # v4 avoids the obsolete SDK "tools" package requested by older setups.
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -32,7 +36,7 @@ jobs:
       - name: Build debug APK
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon clean assembleDebug
+          ./gradlew --no-daemon --stacktrace clean assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
